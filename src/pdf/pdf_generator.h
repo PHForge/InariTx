@@ -3,13 +3,14 @@
 
 #include "blockchain/client.h"
 #include "i18n/translations.h"
+#include "utils/config.h"
 #include <string>
 
 namespace InariTx {
 
 class PDFGenerator {
 public:
-    PDFGenerator(Language lang = Language::EN);
+    PDFGenerator(const Config& config);
     void createReceiptPDF(const TransactionData& data, const std::string& qr_svg);
 
 private:

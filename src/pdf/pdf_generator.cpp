@@ -1,10 +1,12 @@
 #include "pdf_generator.h"
 #include <hpdf.h>
-#include "error.h"
+#include "utils/error.h"
+#include <filesystem>
 
 namespace InariTx {
 
-PDFGenerator::PDFGenerator(Language lang) : translations_(lang) {}
+PDFGenerator::PDFGenerator(const Config& config)
+    : translations_(config.getDefaultLanguage()) {}
 
 void PDFGenerator::createReceiptPDF(const TransactionData& data, const std::string& qr_svg) {
     HPDF_Doc pdf = HPDF_New([](HPDF_STATUS error_no, HPDF_STATUS detail_no, void* user_data) {
@@ -28,8 +30,15 @@ void PDFGenerator::createReceiptPDF(const TransactionData& data, const std::stri
     HPDF_Page_TextOut(page, 50, 650, translations_.get("verify").c_str());
     HPDF_Page_EndText(page);
 
-    // Placeholder for QR code (SVG integration requires additional handling)
+    // Save QR code SVG to temporary file (libharu doesn't support SVG directly)
+    std::string qr_file = "qr_" + data.txid + ".svg";
+    std::ofstream qr_out(qr_file);
+    qr_out << qr_svg;
+    qr_out.close();
+
+    // TODO: Convert SVG to PNG for libharu (requires external tool or library)
     HPDF_SaveToFile(pdf, ("receipt_" + data.txid + ".pdf").c_str());
+    std::filesystem::remove(qr_file); // Clean up
     HPDF_Free(pdf);
 }
 
