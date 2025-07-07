@@ -3,7 +3,7 @@
 
 namespace InariTx {
 
-BitcoinClient::BitcoinClient() {
+BitcoinClient::BitcoinClient(const Config& config) : config_(config) {
     curl_ = curl_easy_init();
     if (!curl_) {
         throw InariTxException("Failed to initialize libcurl");
@@ -22,6 +22,9 @@ size_t BitcoinClient::WriteCallback(void* contents, size_t size, size_t nmemb, s
 }
 
 bool BitcoinClient::isValidTxid(const std::string& txid) {
+    if (txid.empty() || txid.length() != 64) {
+        return false;
+    }
     try {
         auto data = fetchTransaction(txid);
         return !data.txid.empty();
@@ -31,17 +34,22 @@ bool BitcoinClient::isValidTxid(const std::string& txid) {
 }
 
 TransactionData BitcoinClient::fetchTransaction(const std::string& txid) {
+    if (txid.empty() || txid.length() != 64) {
+        throw InvalidTxidError(txid);
+    }
     std::string response;
     std::string url = "https://api.blockcypher.com/v1/btc/main/txs/" + txid;
+    // TODO: Add API key to URL when needed (e.g., ?token=config_.getApiKey())
     curl_easy_setopt(curl_, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl_, CURLOPT_CAINFO, "cacert.pem"); // Use CA bundle
     curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, WriteCallback);
     curl_easy_setopt(curl_, CURLOPT_WRITEDATA, &response);
     CURLcode res = curl_easy_perform(curl_);
     if (res != CURLE_OK) {
         throw ApiError("Failed to fetch transaction: " + std::string(curl_easy_strerror(res)));
     }
-    json data = json::parse(response);
-    if (data.is_null() || !data.contains("hash")) {
+    json data = json::parse(response, nullptr, false);
+    if (data.is_discarded() || !data.contains("hash")) {
         throw InvalidTxidError(txid);
     }
     TransactionData result;
