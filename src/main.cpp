@@ -8,6 +8,7 @@
 
 namespace InariTx {
 
+// Exception class for InariTx errors
 void processTransaction(const std::string& txid, const Config& config) {
     try {
         BitcoinClient client(config);

@@ -165,10 +165,6 @@ The following components are required to build, run, or contribute to this proje
     │   ├── libcurl.a             	# Static library for libcurl (HTTP requests)
     │   ├── libhpdf.a             	# Static library for libharu (PDF generation)
     │   └── libqrcodegen.a        	# Static library for qrcodegen (QR code generation)
-    ├── tests/                    	# Unit tests for validating functionality
-    │   ├── test_main.cpp         	# Main test file initializing the test suite
-    │   ├── test_bitcoin_client.cpp # Tests for the Bitcoin client (blockchain data fetching)
-    │   └── test_pdf_generator.cpp 	# Tests for PDF generation functionality
     ├── docs/                     	# Documentation files
     │   ├── CHANGELOG.md          	# Version history and release notes
     │   └── ARCHITECTURE.md       	# Overview of the project's architecture and design
