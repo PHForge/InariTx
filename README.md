@@ -152,8 +152,6 @@ The following components are required to build, run, or contribute to this proje
     │   │   ├── translations.h    	# Header for managing translations (e.g., English, French)
     │   │   └── translations.cpp  	# Implementation of translation logic
     │   ├── utils/                	# Utility functions for common tasks
-    │   │   ├── error.h           	# Header for error handling and custom exceptions
-    │   │   ├── error.cpp         	# Implementation of error handling
     │   │   ├── config.h          	# Header for configuration management (e.g., API keys, settings)
     │   │   └── config.cpp        	# Implementation of configuration parsing using nlohmann/json
     ├── include/                  	# Third-party library headers

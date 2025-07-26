@@ -1,55 +1,33 @@
-cmake_minimum_required(VERSION 3.20)
-project(InariTx VERSION 0.1 LANGUAGES CXX)
+# Minimum CMake version required
+cmake_minimum_required(VERSION 3.10)
+
+# Project name and version
+project(InariTx VERSION 1.0 LANGUAGES CXX)
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Enable warnings for robust code
-add_compile_options(-Wall -Wextra)
+# Define the executable
+add_executable(InariTx src/main.cpp)
 
-# Include directories
-include_directories(${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/src)
+# Include directories for third-party libraries
+include_directories(${CMAKE_SOURCE_DIR}/include)
+include_directories(${CMAKE_SOURCE_DIR}/include/libharu)
+include_directories(${CMAKE_SOURCE_DIR}/include/nlohmann)
+include_directories(${CMAKE_SOURCE_DIR}/include/curl)
 
-# Link directories for static libraries
-link_directories(${CMAKE_SOURCE_DIR}/lib)
+# Link static libraries
+find_library(LIBHARU_LIBRARY NAMES libhpdf hpdf PATHS ${CMAKE_SOURCE_DIR}/lib)
+find_library(LIBCURL_LIBRARY NAMES libcurl curl PATHS ${CMAKE_SOURCE_DIR}/lib)
 
-# Force static linking for libcurl
-add_definitions(-DCURL_STATICLIB)
+# Link the libraries to the executable
+target_link_libraries(InariTx PRIVATE ${LIBHARU_LIBRARY} ${LIBCURL_LIBRARY})
 
-# Find system dependencies
-find_package(CURL REQUIRED)
-find_library(ZLIB_LIBRARY NAMES z zlib libz PATHS ${CMAKE_SOURCE_DIR}/lib)
-find_library(PNG_LIBRARY NAMES png libpng PATHS ${CMAKE_SOURCE_DIR}/lib)
-
-# Source files
-set(SOURCES
-    src/main.cpp
-    src/blockchain/client.cpp
-    src/blockchain/bitcoin_client.cpp
-    src/pdf/pdf_generator.cpp
-    src/qr/qr_generator.cpp
-    src/i18n/translations.cpp
-    src/utils/error.cpp
-    src/utils/config.cpp
-)
-
-# Executable
-add_executable(InariTx ${SOURCES})
-
-# Link libraries
-target_link_libraries(InariTx PRIVATE
-    hpdf
-    qrcodegen
-    ${CURL_LIBRARIES}
-    ${ZLIB_LIBRARY}
-    ${PNG_LIBRARY}
-    ws2_32
-    wldap32
-    crypt32
-)
-
-# Windows-specific libraries
-if(WIN32)
-    target_link_libraries(InariTx PRIVATE iphlpapi bcrypt)
+# Add MSYS2-specific flags for Windows
+if (WIN32)
+    target_link_libraries(InariTx PRIVATE ws2_32) # Winsock for libcurl
 endif()
+
+# Set output directory for the executable
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
