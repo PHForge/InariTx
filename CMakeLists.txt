@@ -9,7 +9,11 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Define the executable
-add_executable(InariTx src/main.cpp)
+add_executable(InariTx 
+    src/main.cpp
+    src/blockchain/client.cpp
+    src/blockchain/bitcoin_client.cpp
+)
 
 # Include directories for third-party libraries
 include_directories(${CMAKE_SOURCE_DIR}/include)
