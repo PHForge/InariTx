@@ -6,6 +6,8 @@
 #include <nlohmann/json.hpp>
 #include <stdexcept>
 #include <cctype>
+#include <filesystem>
+#include <fstream>
 
 using json = nlohmann::json;
 
@@ -40,6 +42,12 @@ TransactionData BitcoinClient::fetchTransaction(const std::string& txid) {
         throw std::invalid_argument("Invalid TXID format");
     }
 
+    // Define the path to cacert.pem relative to the project root
+    std::filesystem::path cacert_path = std::filesystem::absolute("cacert.pem");
+    if (!std::filesystem::exists(cacert_path)) {
+        throw std::runtime_error("CA certificate file (cacert.pem) not found at: " + cacert_path.string());
+    }
+
     CURL* curl = curl_easy_init();
     if (!curl) {
         throw std::runtime_error("Failed to initialize libcurl");
@@ -52,7 +60,7 @@ TransactionData BitcoinClient::fetchTransaction(const std::string& txid) {
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response_string);
-    curl_easy_setopt(curl, CURLOPT_CAINFO, "cacert.pem"); // Use CA bundle for HTTPS
+    curl_easy_setopt(curl, CURLOPT_CAINFO, cacert_path.string().c_str()); // Use absolute path
 
     // Perform the request
     CURLcode res = curl_easy_perform(curl);

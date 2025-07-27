@@ -30,7 +30,7 @@ target_link_libraries(InariTx PRIVATE ${LIBHARU_LIBRARY} ${LIBCURL_LIBRARY})
 
 # Add MSYS2-specific flags for Windows
 if (WIN32)
-    target_link_libraries(InariTx PRIVATE ws2_32) # Winsock for libcurl
+    target_link_libraries(InariTx PRIVATE ws2_32 stdc++fs) # Add stdc++fs for filesystem
 endif()
 
 # Set output directory for the executable
