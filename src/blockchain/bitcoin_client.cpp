@@ -72,9 +72,32 @@ TransactionData BitcoinClient::fetchTransaction(const std::string& txid) {
     // Clean up curl
     curl_easy_cleanup(curl);
 
+    // Log the raw JSON response for debugging
+    std::ofstream log_file("response.json");
+    log_file << response_string;
+    log_file.close();
+
     // Parse JSON response
     try {
         json j = json::parse(response_string);
+
+        // Check if required fields exist and are not null
+        if (!j.contains("inputs") || !j["inputs"].is_array() || j["inputs"].empty() ||
+            !j["inputs"][0].contains("addresses") || !j["inputs"][0]["addresses"].is_array() ||
+            j["inputs"][0]["addresses"].empty()) {
+            throw std::runtime_error("Invalid or missing input addresses in JSON response");
+        }
+        if (!j.contains("outputs") || !j["outputs"].is_array() || j["outputs"].empty() ||
+            !j["outputs"][0].contains("addresses") || !j["outputs"][0]["addresses"].is_array() ||
+            j["outputs"][0]["addresses"].empty()) {
+            throw std::runtime_error("Invalid or missing output addresses in JSON response");
+        }
+        if (!j.contains("total") || j["total"].is_null()) {
+            throw std::runtime_error("Missing or null total amount in JSON response");
+        }
+        if (!j.contains("confirmed") || j["confirmed"].is_null()) {
+            throw std::runtime_error("Missing or null confirmed timestamp in JSON response");
+        }
 
         TransactionData data;
         data.txid = txid;
