@@ -1,5 +1,6 @@
 # Ignore CMake generated folders and builds
 build/
+build_msys/
 cmake-build-*/
 *.cmake
 CMakeCache.txt
