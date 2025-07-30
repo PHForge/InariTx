@@ -11,9 +11,9 @@ int main() {
     std::cout << "Welcome to InariTx - Professional Bitcoin Transaction Receipts" << std::endl;
 
     // Clear input buffer
-    std::cin.clear();
+    // std::cin.clear();
     // Ignore any leftover characters in the input buffer
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    // std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     std::string txid;
     bool valid_input = false;
